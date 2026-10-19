@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav th:fragment="menu">
-    <a href="/">Inicio</a> |
-    <a href="/catalogo">Catálogo de cuentas</a> |
-    <a href="/clientes">Clientes</a> |
-    <a href="/ventas">Ventas</a> |
-    <a href="/asientos">Asientos contables</a>
-</nav>
+<header th:fragment="menu(activo)" class="sticky top-0 z-50 bg-[#faf5ee]/90 backdrop-blur-md border-b border-[#ece6dc]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <a th:href="@{/}" class="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white shadow-sm hover:shadow-md nav-btn-transition" title="GameZone">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewBox="0 0 24 24"><path d="M6 12h4m-2-2v4m7-2h.01m2.99-2h.01M17 14h.01M6.5 19l2.5-10a2 2 0 0 1 2-1.5h6a2 2 0 0 1 2 1.5l2.5 10a1.5 1.5 0 0 1-2.4 1.5l-3.6-2a2 2 0 0 0-2 0l-3.6 2A1.5 1.5 0 0 1 6.5 19z"></path></svg>
+            </a>
+            <nav aria-label="Navegación principal" class="flex items-center gap-1 sm:gap-2">
+                <a th:href="@{/}" class="px-3 py-2 rounded-xl text-sm font-semibold nav-btn-transition"
+                   th:classappend="${activo == 'inicio'} ? 'bg-[#fbe8d8] text-[#8a4518]' : 'text-[#605850] hover:bg-[#f2ece4] hover:text-[#c2652a]'">Inicio</a>
+                <a th:href="@{/catalogo}" class="px-3 py-2 rounded-xl text-sm font-semibold nav-btn-transition"
+                   th:classappend="${activo == 'catalogo'} ? 'bg-[#fbe8d8] text-[#8a4518]' : 'text-[#605850] hover:bg-[#f2ece4] hover:text-[#c2652a]'">Catálogo de cuentas</a>
+                <a th:href="@{/clientes}" class="px-3 py-2 rounded-xl text-sm font-semibold nav-btn-transition"
+                   th:classappend="${activo == 'clientes'} ? 'bg-[#fbe8d8] text-[#8a4518]' : 'text-[#605850] hover:bg-[#f2ece4] hover:text-[#c2652a]'">Clientes</a>
+                <a th:href="@{/ventas}" class="px-3 py-2 rounded-xl text-sm font-semibold nav-btn-transition"
+                   th:classappend="${activo == 'ventas'} ? 'bg-[#fbe8d8] text-[#8a4518]' : 'text-[#605850] hover:bg-[#f2ece4] hover:text-[#c2652a]'">Ventas</a>
+                <a th:href="@{/asientos}" class="px-3 py-2 rounded-xl text-sm font-semibold nav-btn-transition"
+                   th:classappend="${activo == 'asientos'} ? 'bg-[#fbe8d8] text-[#8a4518]' : 'text-[#605850] hover:bg-[#f2ece4] hover:text-[#c2652a]'">Asientos contables</a>
+            </nav>
+        </div>
+    </div>
+</header>
 </body>
 </html>

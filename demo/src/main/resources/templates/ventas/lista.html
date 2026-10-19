@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Listado de Ventas</title>
-</head>
-<body>
-    <div th:replace="~{fragments/menu :: menu}"></div>
-    <h1>Listado de Ventas</h1>
-    <p>Módulo en construcción.</p>
+<html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Ventas')}"></head>
+<body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased">
+<header th:replace="~{fragments/menu :: menu('ventas')}"></header>
+
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold">Ventas</h1>
+    <p class="mt-2 text-[#605850]">Módulo en construcción.</p>
+</main>
 </body>
 </html>

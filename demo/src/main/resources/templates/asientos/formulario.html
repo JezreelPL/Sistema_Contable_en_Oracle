@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Nuevo asiento')}"></head>
+<body class="min-h-full flex flex-col font-['Plus_Jakarta_Sans'] text-[#3a302a] bg-[#faf5ee] antialiased"></body>
+<header th:replace="~{fragments/menu :: menu('asientos')}"></header>
+<!--fuente de google-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+<main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold">Nuevo asiento</h1>
+
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <form th:action="@{/asientos/guardar}" method="post" class="mt-6 space-y-5 rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-sm">
+        <div>
+            <label for="fecha" class="block text-sm font-semibold mb-1">Fecha</label>
+            <input id="fecha" type="date" name="fecha" required
+                   th:value="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}"
+                   class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+        </div>
+        <div>
+            <label for="descripcion" class="block text-sm font-semibold mb-1">Descripción</label>
+            <input id="descripcion" type="text" name="descripcion" maxlength="200" required
+                   class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+        </div>
+        <div>
+            <label for="idVenta" class="block text-sm font-semibold mb-1">Venta de origen</label>
+            <select id="idVenta" name="idVenta" required
+                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+                <option value="">Selecciona una venta</option>
+                <option th:each="v : ${ventas}" th:value="${v.id}" th:text="${v.numeroFactura}"></option>
+            </select>
+        </div>
+
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-lg font-semibold">Líneas del asiento</h2>
+                <button type="button" onclick="agregar()"
+                        class="px-3 py-1.5 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#8a4518] hover:bg-[#fbe8d8] nav-btn-transition">+ Agregar línea</button>
+            </div>
+            <div class="overflow-hidden rounded-2xl border border-[#ece6dc]">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-[#f4efeb] text-left text-[#605850]">
+                        <tr>
+                            <th class="px-3 py-2 font-semibold">Cuenta</th>
+                            <th class="px-3 py-2 font-semibold w-32">Debe</th>
+                            <th class="px-3 py-2 font-semibold w-32">Haber</th>
+                            <th class="px-3 py-2 w-20"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lineas" class="divide-y divide-[#ece6dc]"></tbody>
+                    <tfoot class="bg-[#faf5ee] font-semibold">
+                        <tr>
+                            <td class="px-3 py-2 text-right">Totales</td>
+                            <td class="px-3 py-2" id="totalDebe">0.00</td>
+                            <td class="px-3 py-2" id="totalHaber">0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <p id="aviso" class="mt-2 text-sm text-[#8a4518]"></p>
+        </div>
+
+        <div class="flex gap-3">
+            <button id="btnGuardar" type="submit" disabled
+                    class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition disabled:opacity-40 disabled:cursor-not-allowed">Guardar</button>
+            <a th:href="@{/asientos}" class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Cancelar</a>
+        </div>
+    </form>
+
+    <template id="fila">
+        <tr>
+            <td class="px-3 py-2">
+                <select name="cuentaId" required class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+                    <option value="">Selecciona una cuenta</option>
+                    <option th:each="c : ${cuentas}" th:value="${c.id}" th:text="${c.codigo} + ' - ' + ${c.nombre}"></option>
+                </select>
+            </td>
+            <td class="px-3 py-2"><input type="number" name="debe" min="0" step="0.01" class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm"></td>
+            <td class="px-3 py-2"><input type="number" name="haber" min="0" step="0.01" class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm"></td>
+            <td class="px-3 py-2"><button type="button" onclick="quitar(this)" class="text-sm font-semibold text-red-700 hover:underline">Quitar</button></td>
+        </tr>
+    </template>
+</main>
+
+<script>
+const cuerpo = document.getElementById('lineas');
+const plantilla = document.getElementById('fila');
+
+function aCentavos(valor) {
+    return Math.round((parseFloat(valor) || 0) * 100);
+}
+
+function agregar() {
+    cuerpo.appendChild(plantilla.content.cloneNode(true));
+    recalcular();
+}
+
+function quitar(boton) {
+    boton.closest('tr').remove();
+    recalcular();
+}
+
+function recalcular() {
+    let debe = 0, haber = 0, filasValidas = true;
+    const filas = cuerpo.querySelectorAll('tr');
+    filas.forEach(tr => {
+        const d = aCentavos(tr.querySelector('[name=debe]').value);
+        const h = aCentavos(tr.querySelector('[name=haber]').value);
+        debe += d;
+        haber += h;
+        if ((d > 0) === (h > 0)) filasValidas = false;
+    });
+    document.getElementById('totalDebe').textContent = (debe / 100).toFixed(2);
+    document.getElementById('totalHaber').textContent = (haber / 100).toFixed(2);
+
+    const cuadra = debe === haber && debe > 0;
+    const aviso = document.getElementById('aviso');
+    if (filas.length < 2) aviso.textContent = 'Agrega al menos dos líneas.';
+    else if (!filasValidas) aviso.textContent = 'Cada línea debe tener monto en el debe o en el haber, no en ambos.';
+    else if (!cuadra) aviso.textContent = 'El debe y el haber deben ser iguales.';
+    else aviso.textContent = '';
+
+    document.getElementById('btnGuardar').disabled = !(filas.length >= 2 && filasValidas && cuadra);
+}
+
+cuerpo.addEventListener('input', recalcular);
+agregar();
+agregar();
+</script>
+</body>
+</html>

@@ -1,12 +1,41 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>GameZone</title>
-</head>
-<body>
-    <div th:replace="~{fragments/menu :: menu}"></div>
-    <h1>GameZone - Sistema contable</h1>
-    <p>Elige un módulo del menú para empezar.</p>
+<html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Inicio')}"></head>
+<body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased selection:bg-[#fbe8d8] selection:text-[#401a08]">
+
+    <!--<header th:replace="~{fragments/menu :: menu('inicio')}"></header>-->
+    <div class="h-16 w-full bg-[#fbe8d8] border-b border-[#f0a878]/50"></div>
+<main class="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <div class="w-full max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fbe8d8] border border-[#f0a878]/50 text-xs font-semibold uppercase tracking-wider text-[#8a4518] mb-6">
+            <span class="w-2 h-2 rounded-full bg-[#c2652a] animate-pulse"></span>Plataforma
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#3a302a]">
+            GameZone <span class="text-[#9a9088] font-light mx-1 sm:mx-2">-</span>
+            <span class="bg-gradient-to-r from-[#c2652a] via-[#e08850] to-[#8a4518] bg-clip-text text-transparent font-bold">Sistema contable</span>
+        </h1>
+        <p class="mt-5 text-lg sm:text-xl text-[#605850] max-w-2xl mx-auto">Elige un módulo del menú para empezar.</p>
+
+        <div class="mt-12 p-3 sm:p-4 rounded-3xl bg-[#f4efeb] border border-[#eae3d9] shadow-sm max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                <a th:href="@{/}" class="group nav-btn-transition flex items-center justify-center p-5 rounded-2xl bg-[#fbe8d8] border border-[#f0a878] shadow-sm hover:shadow-md hover:border-[#c2652a] hover:-translate-y-0.5 min-h-[140px]">
+                    <span class="font-semibold text-[#8a4518] text-sm text-center">Inicio</span>
+                </a>
+                <a th:href="@{/catalogo}" class="group nav-btn-transition flex items-center justify-center p-5 rounded-2xl bg-white border border-[#ece6dc] shadow-sm hover:shadow-md hover:border-[#f0a878] hover:bg-[#faf5ee] hover:-translate-y-0.5 min-h-[140px]">
+                    <span class="font-semibold text-[#3a302a] text-sm text-center leading-tight group-hover:text-[#c2652a]">Catálogo de cuentas</span>
+                </a>
+                <a th:href="@{/clientes}" class="group nav-btn-transition flex items-center justify-center p-5 rounded-2xl bg-white border border-[#ece6dc] shadow-sm hover:shadow-md hover:border-[#f0a878] hover:bg-[#faf5ee] hover:-translate-y-0.5 min-h-[140px]">
+                    <span class="font-semibold text-[#3a302a] text-sm text-center group-hover:text-[#c2652a]">Clientes</span>
+                </a>
+                <a th:href="@{/ventas}" class="group nav-btn-transition flex items-center justify-center p-5 rounded-2xl bg-white border border-[#ece6dc] shadow-sm hover:shadow-md hover:border-[#f0a878] hover:bg-[#faf5ee] hover:-translate-y-0.5 min-h-[140px]">
+                    <span class="font-semibold text-[#3a302a] text-sm text-center group-hover:text-[#c2652a]">Ventas</span>
+                </a>
+                <a th:href="@{/asientos}" class="group nav-btn-transition flex items-center justify-center p-5 rounded-2xl bg-white border border-[#ece6dc] shadow-sm hover:shadow-md hover:border-[#f0a878] hover:bg-[#faf5ee] hover:-translate-y-0.5 min-h-[140px]">
+                    <span class="font-semibold text-[#3a302a] text-sm text-center leading-tight group-hover:text-[#c2652a]">Asientos contables</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
 </body>
 </html>
