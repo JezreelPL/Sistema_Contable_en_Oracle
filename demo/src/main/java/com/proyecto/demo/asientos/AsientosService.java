@@ -46,13 +46,38 @@ public class AsientosService {
             boolean enDebe = l.debe().signum() > 0;
             boolean enHaber = l.haber().signum() > 0;
             if (enDebe == enHaber) {
-                throw new IllegalArgumentException("Cada línea debe tener monto en el debe o en el haber, pero no en ambos.");
+                throw new IllegalArgumentException(
+                        "Cada línea debe tener monto en el debe o en el haber, pero no en ambos.");
             }
             totalDebe = totalDebe.add(l.debe());
             totalHaber = totalHaber.add(l.haber());
         }
         if (totalDebe.compareTo(totalHaber) != 0) {
-            throw new IllegalArgumentException("El asiento no cuadra: debe " + totalDebe + " y haber " + totalHaber + ".");
+            throw new IllegalArgumentException(
+                    "El asiento no cuadra: debe " + totalDebe + " y haber " + totalHaber + ".");
+        }
+    }
+
+    @Transactional
+    public void actualizar(long id, LocalDate fecha, String descripcion, long idVenta, List<LineaAsiento> lineas) {
+        if (descripcion == null || descripcion.isBlank()) {
+            throw new IllegalArgumentException("La descripción es obligatoria.");
+        }
+        validarLineas(lineas);
+
+        repositorio.actualizar(id, fecha, descripcion.trim(), idVenta);
+        repositorio.borrarLineas(id);
+        for (LineaAsiento linea : lineas) {
+            repositorio.crearLinea(id, linea);
+        }
+    }
+
+    @Transactional
+    public void eliminar(long id) {
+        repositorio.borrarLineas(id);
+        int borrados = repositorio.borrar(id);
+        if (borrados == 0) {
+            throw new IllegalArgumentException("El asiento no existe.");
         }
     }
 }

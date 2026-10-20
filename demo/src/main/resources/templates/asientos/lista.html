@@ -1,12 +1,54 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Asientos contables')}"></head>
+
+<div id="modalEliminar" class="fixed inset-0 z-[60] hidden items-center justify-center bg-[#3a302a]/40 backdrop-blur-sm px-4">
+    <div class="w-full max-w-md rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-lg font-bold text-red-700">!</div>
+            <h2 class="text-lg font-bold">Eliminar asiento</h2>
+        </div>
+        <p class="mt-4 text-sm text-[#605850]">
+            Vas a eliminar el asiento <span id="modalNombre" class="font-semibold text-[#3a302a]"></span>
+            y todas sus líneas. Esta acción no se puede deshacer.
+        </p>
+        <form id="formEliminar" method="post" class="mt-6 flex justify-end gap-3">
+            <button type="button" onclick="cerrarModal()"
+                    class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Cancelar</button>
+            <button type="submit"
+                    class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold shadow-sm hover:bg-red-700 nav-btn-transition">Sí, eliminar</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+const modal = document.getElementById('modalEliminar');
+
+function abrirModal(boton) {
+    document.getElementById('formEliminar').action = boton.dataset.url;
+    document.getElementById('modalNombre').textContent = '"' + boton.dataset.nombre + '"';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function cerrarModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+modal.addEventListener('click', e => { if (e.target === modal) cerrarModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+</script>
+
 <body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased">
 <header th:replace="~{fragments/menu :: menu('asientos')}"></header>
 
 <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-3xl font-bold">Asientos Contables</h1>
     <a th:href="@{/asientos/nuevo}" class="inline-block mt-6 px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition">+ Nuevo asiento</a>
+    <div th:if="${mensaje}" th:text="${mensaje}" class="mt-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"></div>
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
     <div class="mt-6 overflow-hidden rounded-2xl border border-[#ece6dc] bg-white shadow-sm">
         <table class="min-w-full text-sm">
             <thead class="bg-[#f4efeb] text-left text-[#605850]">
@@ -15,6 +57,7 @@
                     <th class="px-4 py-3 font-semibold">Descripción</th>
                     <th class="px-4 py-3 font-semibold">Factura de origen</th>
                     <th class="px-4 py-3 font-semibold">Total</th>
+                    <th class="px-4 py-3"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#ece6dc]">
@@ -23,6 +66,15 @@
                     <td class="px-4 py-3" th:text="${a.descripcion}"></td>
                     <td class="px-4 py-3" th:text="${a.numeroFactura}"></td>
                     <td class="px-4 py-3" th:text="'Q ' + ${#numbers.formatDecimal(a.total, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td class="px-4 py-3 text-right">
+                    <div class="flex items-center justify-end gap-4">
+                        <a th:href="@{/asientos/{id}/editar(id=${a.id})}" class="text-sm font-semibold text-[#8a4518] hover:underline">Editar</a>
+                        <button type="button"
+                                th:attr="data-url=@{/asientos/{id}/eliminar(id=${a.id})},data-nombre=${a.descripcion}"
+                                onclick="abrirModal(this)"
+                                class="text-sm font-semibold text-red-700 hover:underline">Eliminar</button>
+                    </div>
+                </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(asientos)}">
                     <td colspan="4" class="px-4 py-6 text-center text-[#605850]">No hay asientos registrados.</td>

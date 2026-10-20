@@ -5,9 +5,14 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+
+import java.math.BigDecimal;
+import java.util.Objects;
 
 @Repository
 public class AsientosRepository {
@@ -57,8 +62,8 @@ public class AsientosRepository {
         }, llave);
         return llave.getKey().longValue();
     }
-    
-    //listar cuentas
+
+    // listar cuentas
     public List<CuentaOpcion> listarCuentas() {
         return jdbc.query(
                 "SELECT id_Cuenta_Contable, codigo, nombre FROM Catalogo_Cuentas ORDER BY codigo",
@@ -67,11 +72,48 @@ public class AsientosRepository {
                         rs.getString("codigo"),
                         rs.getString("nombre")));
     }
-    //Crear linea 
+
+    // Crear linea
     public void crearLinea(long idAsiento, LineaAsiento linea) {
         jdbc.update(
                 "INSERT INTO Asientos_Detalle (id_Asiento, id_Cuenta_Contable, debe, haber) VALUES (?, ?, ?, ?)",
                 idAsiento, linea.idCuenta(), linea.debe(), linea.haber());
     }
+
+    public AsientoEdicion buscarPorId(long id) {
+        return jdbc.queryForObject(
+                "SELECT id_Asiento, fecha_asiento, descripcion, id_Venta FROM Asientos_Contables WHERE id_Asiento = ?",
+                (rs, fila) -> new AsientoEdicion(
+                        rs.getLong("id_Asiento"),
+                        rs.getObject("fecha_asiento", LocalDate.class),
+                        rs.getString("descripcion"),
+                        rs.getObject("id_Venta", Long.class)),
+                id);
+    }
+
+    public List<LineaAsiento> listarLineas(long idAsiento) {
+        return jdbc.query(
+                "SELECT id_Cuenta_Contable, debe, haber FROM Asientos_Detalle WHERE id_Asiento = ? ORDER BY id_Detalle",
+                (rs, fila) -> new LineaAsiento(
+                        rs.getLong("id_Cuenta_Contable"),
+                        Objects.requireNonNullElse(rs.getBigDecimal("debe"), BigDecimal.ZERO),
+                        Objects.requireNonNullElse(rs.getBigDecimal("haber"), BigDecimal.ZERO)),
+                idAsiento);
+    }
+
+    public void actualizar(long id, LocalDate fecha, String descripcion, long idVenta) {
+        jdbc.update(
+                "UPDATE Asientos_Contables SET fecha_asiento = ?, descripcion = ?, id_Venta = ? WHERE id_Asiento = ?",
+                java.sql.Date.valueOf(fecha), descripcion, idVenta, id);
+    }
+
+    public void borrarLineas(long idAsiento) {
+        jdbc.update("DELETE FROM Asientos_Detalle WHERE id_Asiento = ?", idAsiento);
+    }
+
+
+    public int borrar(long id) {
+    return jdbc.update("DELETE FROM Asientos_Contables WHERE id_Asiento = ?", id);
+}
 
 }
