@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Nuevo asiento')}"></head>
-<body class="min-h-full flex flex-col font-['Plus_Jakarta_Sans'] text-[#3a302a] bg-[#faf5ee] antialiased"></body>
+<head th:replace="~{fragments/head :: head('Asiento')}"></head>
+<body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased">
 <header th:replace="~{fragments/menu :: menu('asientos')}"></header>
-<!--fuente de google-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
 <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <h1 class="text-3xl font-bold">Nuevo asiento</h1>
-
+    <h1 class="text-3xl font-bold" th:text="${editando} ? 'Editar asiento' : 'Nuevo asiento'">Nuevo asiento</h1>
     <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
-    <form th:action="@{/asientos/guardar}" method="post" class="mt-6 space-y-5 rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-sm">
-        <div>
+    <form th:action="${editando} ? @{/asientos/{id}/actualizar(id=${asiento.id})} : @{/asientos/guardar}"
+          method="post" class="mt-6 space-y-5 rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-sm">
+        
+          <div>
             <label for="fecha" class="block text-sm font-semibold mb-1">Fecha</label>
             <input id="fecha" type="date" name="fecha" required
-                   th:value="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}"
+                   th:value="${asiento != null} ? ${asiento.fecha} : ${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}"
                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
         </div>
         <div>
             <label for="descripcion" class="block text-sm font-semibold mb-1">Descripción</label>
             <input id="descripcion" type="text" name="descripcion" maxlength="200" required
+                   th:value="${asiento != null} ? ${asiento.descripcion}"
                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
         </div>
         <div>
@@ -30,7 +28,8 @@
             <select id="idVenta" name="idVenta" required
                     class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
                 <option value="">Selecciona una venta</option>
-                <option th:each="v : ${ventas}" th:value="${v.id}" th:text="${v.numeroFactura}"></option>
+                <option th:each="v : ${ventas}" th:value="${v.id}" th:text="${v.numeroFactura}"
+                        th:selected="${asiento != null and asiento.idVenta == v.id}"></option>
             </select>
         </div>
 
@@ -50,7 +49,24 @@
                             <th class="px-3 py-2 w-20"></th>
                         </tr>
                     </thead>
-                    <tbody id="lineas" class="divide-y divide-[#ece6dc]"></tbody>
+                    <tbody id="lineas" class="divide-y divide-[#ece6dc]">
+                        <tr th:each="l : ${lineas}">
+                            <td class="px-3 py-2">
+                                <select name="cuentaId" required class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+                                    <option value="">Selecciona una cuenta</option>
+                                    <option th:each="c : ${cuentas}" th:value="${c.id}" th:text="${c.codigo} + ' - ' + ${c.nombre}"
+                                            th:selected="${c.id == l.idCuenta}"></option>
+                                </select>
+                            </td>
+                            <td class="px-3 py-2"><input type="number" name="debe" min="0" step="0.01"
+                                    th:value="${l.debe.signum() > 0} ? ${l.debe}"
+                                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm"></td>
+                            <td class="px-3 py-2"><input type="number" name="haber" min="0" step="0.01"
+                                    th:value="${l.haber.signum() > 0} ? ${l.haber}"
+                                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm"></td>
+                            <td class="px-3 py-2"><button type="button" onclick="quitar(this)" class="text-sm font-semibold text-red-700 hover:underline">Quitar</button></td>
+                        </tr>
+                    </tbody>
                     <tfoot class="bg-[#faf5ee] font-semibold">
                         <tr>
                             <td class="px-3 py-2 text-right">Totales</td>
@@ -128,8 +144,12 @@ function recalcular() {
 }
 
 cuerpo.addEventListener('input', recalcular);
-agregar();
-agregar();
+if (cuerpo.children.length === 0) {
+    agregar();
+    agregar();
+} else {
+    recalcular();
+}
 </script>
 </body>
 </html>
