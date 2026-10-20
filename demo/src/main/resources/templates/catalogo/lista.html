@@ -6,7 +6,55 @@
 
 <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-3xl font-bold">Catálogo de cuentas</h1>
-    <p class="mt-2 text-[#605850]">Módulo en construcción.</p>
+
+    <div th:if="${mensaje}" th:text="${mensaje}" class="mt-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"></div>
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <form th:action="@{/catalogo}" method="get" class="flex flex-1 max-w-xl gap-2">
+            <input type="text" name="buscar" th:value="${buscar}" maxlength="100"
+                   placeholder="Buscar por nombre o código"
+                   class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+            <button type="submit"
+                    class="px-4 py-2 rounded-xl border border-[#ece6dc] bg-white text-sm font-semibold text-[#8a4518] hover:bg-[#fbe8d8] nav-btn-transition">Buscar</button>
+            <a th:if="${!#strings.isEmpty(buscar)}" th:href="@{/catalogo}"
+               class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Limpiar</a>
+        </form>
+        <a th:href="@{/catalogo/nuevo}"
+           class="inline-block px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition text-center">+ Nueva cuenta</a>
+    </div>
+
+    <div class="mt-6 overflow-x-auto rounded-2xl border border-[#ece6dc] bg-white shadow-sm">
+        <table class="min-w-full text-sm">
+            <thead class="bg-[#f4efeb] text-left text-[#605850]">
+                <tr>
+                    <th class="px-4 py-3 font-semibold">Código</th>
+                    <th class="px-4 py-3 font-semibold">Nombre</th>
+                    <th class="px-4 py-3 font-semibold">Tipo</th>
+                    <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#ece6dc]">
+                <tr th:each="c : ${cuentas}">
+                    <td class="px-4 py-3 font-semibold" th:text="${c.codigo}"></td>
+                    <td class="px-4 py-3" th:text="${c.nombre}"></td>
+                    <td class="px-4 py-3">
+                        <span class="inline-block px-2.5 py-1 rounded-full bg-[#fbe8d8] text-xs font-semibold text-[#8a4518]" th:text="${c.tipo}"></span>
+                    </td>
+                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                        <a th:href="@{/catalogo/{id}/editar(id=${c.id})}"
+                           class="px-3 py-1.5 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#8a4518] hover:bg-[#fbe8d8] nav-btn-transition">Editar</a>
+                        <a th:href="@{/catalogo/{id}/eliminar(id=${c.id})}"
+                           class="ml-1 px-3 py-1.5 rounded-xl border border-red-200 text-sm font-semibold text-red-700 hover:bg-red-50 nav-btn-transition">Borrar</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(cuentas)}">
+                    <td colspan="4" class="px-4 py-6 text-center text-[#605850]"
+                        th:text="${#strings.isEmpty(buscar)} ? 'No hay cuentas registradas. Crea la primera con «Nueva cuenta».' : 'No se encontraron cuentas con esa búsqueda.'"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 </body>
 </html>
