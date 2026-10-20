@@ -6,7 +6,66 @@
 
 <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-3xl font-bold">Clientes</h1>
-    <p class="mt-2 text-[#605850]">Módulo en construcción.</p>
+
+    <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <form method="get" th:action="@{/clientes}" class="w-full sm:max-w-md">
+            <label for="filtro" class="sr-only">Buscar cliente</label>
+            <div class="flex gap-2">
+                <input id="filtro" type="text" name="filtro" th:value="${filtro}"
+                       placeholder="Buscar por nombre o NIT"
+                       class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition">Buscar</button>
+            </div>
+        </form>
+
+        <a th:href="@{/clientes/nuevo}" class="inline-block px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition">+ Nuevo cliente</a>
+    </div>
+
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <div class="mt-6 overflow-hidden rounded-2xl border border-[#ece6dc] bg-white shadow-sm">
+        <table class="min-w-full text-sm">
+            <thead class="bg-[#f4efeb] text-left text-[#605850]">
+                <tr>
+                    <th class="px-4 py-3 font-semibold">Nombre</th>
+                    <th class="px-4 py-3 font-semibold">Dirección</th>
+                    <th class="px-4 py-3 font-semibold">NIT</th>
+                    <th class="px-4 py-3 font-semibold">Correo</th>
+                    <th class="px-4 py-3 font-semibold">Teléfono</th>
+                    <th class="px-4 py-3 font-semibold">Fecha registro</th>
+                    <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#ece6dc]">
+                <tr th:each="cliente : ${clientes}">
+                    <td class="px-4 py-3" th:text="${cliente.nombre}"></td>
+                    <td class="px-4 py-3" th:text="${cliente.direccion} ?: '—'"></td>
+                    <td class="px-4 py-3" th:text="${cliente.nit} ?: '—'"></td>
+                    <td class="px-4 py-3" th:text="${cliente.correo} ?: '—'"></td>
+                    <td class="px-4 py-3" th:text="${cliente.telefono} ?: '—'"></td>
+                    <td class="px-4 py-3" th:text="${cliente.fechaRegistro != null ? #temporals.format(cliente.fechaRegistro, 'dd/MM/yyyy') : '—'}"></td>
+                    <td class="px-4 py-3">
+                        <div class="flex justify-end gap-2">
+                            <a th:href="@{/clientes/editar/{id}(id=${cliente.idCliente})}" class="px-3 py-1.5 rounded-lg border border-[#ece6dc] text-xs font-semibold text-[#8a4518] hover:bg-[#fbe8d8] nav-btn-transition">Editar</a>
+                            <form th:action="@{/clientes/eliminar/{id}(id=${cliente.idCliente})}" method="post" onsubmit="return confirmarBorrado();">
+                                <input type="hidden" name="filtro" th:value="${filtro}">
+                                <button type="submit" class="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-semibold text-red-700 hover:bg-red-50 nav-btn-transition">Borrar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                    <td colspan="7" class="px-4 py-6 text-center text-[#605850]">No hay clientes registrados.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
+
+<script>
+function confirmarBorrado() {
+    return confirm('¿Deseas eliminar este cliente?');
+}
+</script>
 </body>
 </html>
