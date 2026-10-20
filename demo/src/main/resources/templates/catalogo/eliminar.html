@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Borrar cuenta')}"></head>
+<body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased">
+<header th:replace="~{fragments/menu :: menu('catalogo')}"></header>
+
+<main class="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold">Borrar cuenta</h1>
+
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <div class="mt-6 rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-sm">
+        <p class="text-sm text-[#605850]">¿Seguro que quieres borrar esta cuenta? Esta acción no se puede deshacer.</p>
+
+        <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <dt class="font-semibold">Código</dt>
+            <dd th:text="${cuenta.codigo}"></dd>
+            <dt class="font-semibold">Nombre</dt>
+            <dd th:text="${cuenta.nombre}"></dd>
+            <dt class="font-semibold">Tipo</dt>
+            <dd th:text="${cuenta.tipo}"></dd>
+        </dl>
+
+        <form th:action="@{/catalogo/{id}/borrar(id=${cuenta.id})}" method="post" class="mt-6 flex gap-3">
+            <button type="submit"
+                    class="px-4 py-2 rounded-xl bg-red-700 text-white text-sm font-semibold shadow-sm hover:bg-red-800 nav-btn-transition">Sí, borrar</button>
+            <a th:href="@{/catalogo}"
+               class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Cancelar</a>
+        </form>
+    </div>
+</main>
+</body>
+</html>

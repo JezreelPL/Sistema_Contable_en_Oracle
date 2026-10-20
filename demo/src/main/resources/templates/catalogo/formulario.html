@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#faf5ee]" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Cuenta contable')}"></head>
+<body class="min-h-full flex flex-col font-['Manrope'] text-[#3a302a] bg-[#faf5ee] antialiased">
+<header th:replace="~{fragments/menu :: menu('catalogo')}"></header>
+
+<main class="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold" th:text="${cuenta.id > 0} ? 'Editar cuenta' : 'Nueva cuenta'">Nueva cuenta</h1>
+
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <form th:action="@{/catalogo/guardar}" method="post" class="mt-6 space-y-5 rounded-2xl border border-[#ece6dc] bg-white p-6 shadow-sm">
+        <input type="hidden" name="id" th:if="${cuenta.id > 0}" th:value="${cuenta.id}">
+
+        <div>
+            <label for="codigo" class="block text-sm font-semibold mb-1">Código</label>
+            <input id="codigo" type="text" name="codigo" maxlength="20" required
+                   pattern="[A-Za-z0-9.\-]+"
+                   title="Solo letras, números, punto y guion"
+                   th:value="${cuenta.codigo}"
+                   class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+            <p class="mt-1 text-xs text-[#605850]">Máximo 20 caracteres. Debe ser único. Ejemplo: 1101</p>
+        </div>
+
+        <div>
+            <label for="nombre" class="block text-sm font-semibold mb-1">Nombre</label>
+            <input id="nombre" type="text" name="nombre" maxlength="100" required
+                   th:value="${cuenta.nombre}"
+                   class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+            <p class="mt-1 text-xs text-[#605850]">Máximo 100 caracteres. Ejemplo: Cuentas por Cobrar</p>
+        </div>
+
+        <div>
+            <label for="tipo" class="block text-sm font-semibold mb-1">Tipo de cuenta</label>
+            <select id="tipo" name="tipo" required
+                    class="w-full rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+                <option value="">Selecciona un tipo</option>
+                <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}" th:selected="${t == cuenta.tipo}"></option>
+            </select>
+        </div>
+
+        <div class="flex gap-3">
+            <button type="submit"
+                    class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition">Guardar</button>
+            <a th:href="@{/catalogo}"
+               class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Cancelar</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>
