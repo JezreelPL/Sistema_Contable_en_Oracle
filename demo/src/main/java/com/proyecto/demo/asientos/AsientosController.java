@@ -29,8 +29,9 @@ public class AsientosController {
     }
 
     @GetMapping("/asientos")
-    public String lista(Model model) {
-        model.addAttribute("asientos", repositorio.listar());
+    public String lista(@RequestParam(defaultValue = "") String texto, Model model) {
+        model.addAttribute("asientos", repositorio.listar(texto.trim()));
+        model.addAttribute("texto", texto);
         return "asientos/lista";
     }
 
@@ -131,4 +132,5 @@ public class AsientosController {
         }
         return "redirect:/asientos";
     }
+
 }
