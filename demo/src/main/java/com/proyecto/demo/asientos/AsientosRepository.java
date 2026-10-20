@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -24,7 +23,7 @@ public class AsientosRepository {
     }
 
     // Listar los Asientos
-    public List<Asiento> listar() {
+    public List<Asiento> listar(String texto) {
         String sql = """
                 SELECT a.id_Asiento, a.fecha_asiento, a.descripcion, v.numero_factura,
                        (SELECT NVL(SUM(d.debe), 0)
@@ -32,14 +31,18 @@ public class AsientosRepository {
                         WHERE d.id_Asiento = a.id_Asiento) AS total
                 FROM Asientos_Contables a
                 LEFT JOIN Ventas v ON v.id_Venta = a.id_Venta
+                WHERE UPPER(a.descripcion) LIKE UPPER(?)
+                   OR UPPER(v.numero_factura) LIKE UPPER(?)
                 ORDER BY a.id_Asiento DESC
                 """;
+        String patron = "%" + texto + "%";
         return jdbc.query(sql, (rs, fila) -> new Asiento(
                 rs.getLong("id_Asiento"),
                 rs.getObject("fecha_asiento", LocalDate.class),
                 rs.getString("descripcion"),
                 rs.getString("numero_factura"),
-                rs.getBigDecimal("total")));
+                rs.getBigDecimal("total")),
+                patron, patron);
     }
 
     // Listar las ventas
@@ -111,9 +114,8 @@ public class AsientosRepository {
         jdbc.update("DELETE FROM Asientos_Detalle WHERE id_Asiento = ?", idAsiento);
     }
 
-
     public int borrar(long id) {
-    return jdbc.update("DELETE FROM Asientos_Contables WHERE id_Asiento = ?", id);
-}
+        return jdbc.update("DELETE FROM Asientos_Contables WHERE id_Asiento = ?", id);
+    }
 
 }
