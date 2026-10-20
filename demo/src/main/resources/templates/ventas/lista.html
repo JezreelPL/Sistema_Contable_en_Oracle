@@ -6,7 +6,57 @@
 
 <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-3xl font-bold">Ventas</h1>
-    <p class="mt-2 text-[#605850]">Módulo en construcción.</p>
+
+    <div th:if="${ok}" th:text="${ok}" class="mt-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"></div>
+    <div th:if="${error}" th:text="${error}" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+        <a th:href="@{/ventas/nuevo}" class="inline-block px-4 py-2 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-sm font-semibold shadow-sm hover:shadow-md nav-btn-transition">+ Nueva venta</a>
+
+        <form th:action="@{/ventas}" method="get" class="flex gap-2 ml-auto">
+            <input type="text" name="buscar" th:value="${buscar}" placeholder="Buscar por factura o cliente"
+                   class="w-64 rounded-xl border-[#ece6dc] focus:border-[#c2652a] focus:ring-[#c2652a] text-sm">
+            <button type="submit" class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#8a4518] hover:bg-[#fbe8d8] nav-btn-transition">Buscar</button>
+            <a th:if="${buscar != null and !buscar.isBlank()}" th:href="@{/ventas}" class="px-4 py-2 rounded-xl border border-[#ece6dc] text-sm font-semibold text-[#605850] hover:bg-[#f2ece4] nav-btn-transition">Limpiar</a>
+        </form>
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-2xl border border-[#ece6dc] bg-white shadow-sm">
+        <table class="min-w-full text-sm">
+            <thead class="bg-[#f4efeb] text-left text-[#605850]">
+                <tr>
+                    <th class="px-4 py-3 font-semibold">Factura</th>
+                    <th class="px-4 py-3 font-semibold">Cliente</th>
+                    <th class="px-4 py-3 font-semibold">Fecha</th>
+                    <th class="px-4 py-3 font-semibold">Total</th>
+                    <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-[#ece6dc]">
+                <tr th:each="v : ${ventas}">
+                    <td class="px-4 py-3" th:text="${v.numeroFactura}"></td>
+                    <td class="px-4 py-3" th:text="${v.nombreCliente}"></td>
+                    <td class="px-4 py-3" th:text="${#temporals.format(v.fecha, 'dd/MM/yyyy')}"></td>
+                    <td class="px-4 py-3" th:text="'Q ' + ${#numbers.formatDecimal(v.total, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center justify-end gap-3">
+                            <a th:href="@{/asientos/nuevo(idVenta=${v.id})}"
+                               class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#c2652a] to-[#8a4518] text-white text-xs font-semibold shadow-sm hover:shadow-md nav-btn-transition">Generar asiento</a>
+                            <a th:href="@{/ventas/{id}/editar(id=${v.id})}" class="text-sm font-semibold text-[#8a4518] hover:underline">Editar</a>
+                            <form th:action="@{/ventas/eliminar}" method="post" class="inline"
+                                  th:attr="onsubmit=|return confirm('¿Eliminar la venta ${v.numeroFactura}?');|">
+                                <input type="hidden" name="id" th:value="${v.id}">
+                                <button type="submit" class="text-sm font-semibold text-red-700 hover:underline">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(ventas)}">
+                    <td colspan="5" class="px-4 py-6 text-center text-[#605850]">No hay ventas registradas.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </main>
 </body>
 </html>
